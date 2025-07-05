@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS messages (
+  id SERIAL PRIMARY KEY,
+  username TEXT NOT NULL,
+  text TEXT NOT NULL,
+  timestamp BIGINT NOT NULL
+);
