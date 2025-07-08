@@ -8,6 +8,9 @@ type Message = {
   timestamp: number;
 };
 
+
+
+
 let messages: Message[] = [];
 let clients: Map<WebSocket, number> = new Map();
 
@@ -15,8 +18,7 @@ const server = http.createServer();
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws: WebSocket) => {
-  let lastId = 0; // contador global de mensagens
-
+let lastId = 0;
   console.log('Client connected');
 
   // Assign client a lastReceivedId (0 for new users)

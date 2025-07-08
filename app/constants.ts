@@ -1,1 +1,1 @@
-export const API_URL = "http://192.168.1.200"; // Change this to your local IP
+export const API_URL = "http://192.168.68.111"; // Change this to your local IP

@@ -24,10 +24,10 @@ export default function ChatScreen() {
   const ws = useRef<WebSocket | null>(null);
   const user = "User_" + Math.floor(Math.random() * 1000);
 
-  const deduplicateMessages = (incoming: Message[]): Message[] => {
-    const existingIds = new Set(messages.map(m => m.id));
-    return incoming.filter(m => !existingIds.has(m.id));
-  };
+  const deduplicateMessages = (existing: Message[], incoming: Message[]): Message[] => {
+  const existingIds = new Set(existing.map((m) => m.id));
+  return incoming.filter((m) => !existingIds.has(m.id));
+};
 
   useEffect(() => {
     const lastId = messages.length > 0 ? messages[messages.length - 1].id : 0;
@@ -43,27 +43,25 @@ export default function ChatScreen() {
     };
 
     ws.current.onmessage = (event) => {
-      const data = JSON.parse(event.data);
+  const data = JSON.parse(event.data);
 
-      if (data.type === 'init') {
-        setMessages(data.messages);
-      }
+  setMessages((prev) => {
+    if (data.type === 'init') {
+      return deduplicateMessages(prev, data.messages);
+    }
 
-      if (data.type === 'new') {
-        const unique = deduplicateMessages([data.message]);
-        if (unique.length > 0) {
-          setMessages((prev) => [...prev, ...unique]);
-          flatListRef.current?.scrollToEnd({ animated: true });
-        }
-      }
+    if (data.type === 'new') {
+      return [...prev, ...deduplicateMessages(prev, [data.message])];
+    }
 
-      if (data.type === 'sync') {
-        const unique = deduplicateMessages(data.messages);
-        if (unique.length > 0) {
-          setMessages((prev) => [...prev, ...unique]);
-        }
-      }
-    };
+    if (data.type === 'sync') {
+      return [...prev, ...deduplicateMessages(prev, data.messages)];
+    }
+
+    return prev;
+  });
+};
+
 
     ws.current.onerror = (err) => {
       console.log("❌ WebSocket error:", err);
